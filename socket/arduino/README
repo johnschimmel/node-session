@@ -10,7 +10,7 @@ With two socket servers running, the users from the webpage will connect to Sock
 ##Arduino
 
 * Prepare the ethernet Arduino shield or other xport, wifly, etc. 
-* Default, put an LED on Pin 9.
+* Default, put an LED on pin 9.
 * When the Arduino hardware is ready, open the Arduino IDE, in .pde file, modify the server IP address, save the code.
 * Upload the code to the Arduino
 
