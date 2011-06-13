@@ -6,7 +6,7 @@ var http = require('http')
   , net = require('net')
   , url = require('url')
   , fs = require('fs')
-  , io = require('../')
+  , io = require('socket.io')
   , sys = require(process.binding('natives').util ? 'util' : 'sys')
   , server;
     
