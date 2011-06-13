@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+  <head>
+    <title>socket.io client test</title>
+        
+    <script src="http://66.228.36.134:8090/json.js"></script> <!-- for ie -->
+    <script src="http://66.228.36.134:8090/socket.io/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+    
+  </head>
+  <body>
+    
+    <script>
+      function message(obj){
+        var el = document.createElement('p');
+        if ('announcement' in obj) el.innerHTML = '<em>' + esc(obj.announcement) + '</em>';
+        else if ('message' in obj) el.innerHTML = '<b>' + esc(obj.message[0]) + ':</b> ' + esc(obj.message[1]);
+        
+        if (obj.message[0] == "you" && obj.message[1] == "1") {
+            jQuery('#button').css('background-color','green');
+            
+        } else if (obj.message[0] != "arduino" && obj.message[0] != "you" && obj.message[1] == "1") {
+            jQuery('#button').css('background-color','yellow');
+            
+        } else if (obj.message[1] == "0") {
+            jQuery('#button').css('background-color','white');            
+        }
+        
+        if( obj.message && window.console && console.log ) console.log(obj.message[0], obj.message[1]);
+        
+      }
+      
+      function turnOn() {
+          socket.send('1');
+          message({ message: ['you', '1'] });
+      }
+      
+      function turnOff() {
+          socket.send('0');
+          message({ message: ['you', '0'] });
+      }
+      
+      function esc(msg){
+        return msg.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      };
+      
+      var socket = new io.Socket(null, {port: 8090, rememberTransport: false});
+      socket.connect();
+      socket.on('message', function(obj){
+        if ('buffer' in obj){
+          //ignore this
+        } else message(obj);
+      });
+      
+      socket.on('connect', function(){ message({ message: ['System', 'Connected']})});
+      socket.on('disconnect', function(){ message({ message: ['System', 'Disconnected']})});
+      socket.on('reconnect', function(){ message({ message: ['System', 'Reconnected to server']})});
+      socket.on('reconnecting', function( nextRetry ){ message({ message: ['System', 'Attempting to re-connect to the server, next attempt in ' + nextRetry + 'ms']})});
+      socket.on('reconnect_failed', function(){ message({ message: ['System', 'Reconnected to server FAILED.']})});
+      
+      jQuery('document').ready(function(){
+          jQuery('#button').mousedown(function() {
+              turnOn();
+          });
+          
+          jQuery('#button').mouseup(function() {
+              turnOff();
+          });
+          
+          //add in iphone mobile safari touch events
+          document.addEventListener("touchstart", turnOn, true);
+          document.addEventListener("touchend", turnOff, true);
+          document.addEventListener("touchcancel", turnOff, true);
+      })
+    </script>
+    
+    <div id='button'>
+        <br/><Br/>
+        Tap to turn LED my on.
+        <br/><br/>
+        Release to turn LED off.
+
+        <p>
+            <span id="greenLegend">Green</span> => You are blinking it.<br/>
+            <span id="yellowLegend">Yellow</span> => Someone else is blinking it
+        <p>
+
+    </div>
+    
+    
+    
+    <style>
+        body { 
+            width:960px;
+            height:320px;
+        }
+        #button {
+            border:2px solid black;
+            padding:12px;
+            text-align:center;
+            font-family:'Helvetica';
+            font-size:30px;
+            margin:0 auto;
+            width:90%;
+            height:90%;
+
+        }
+        p { font-size:18px;}
+        #greenLegend { color:#3EA055; font-size:18px;}
+        #yellowLegend { color:#CDAD00; font-size:18px;}
+
+    </style>
+    
+  </body>
+</html>
