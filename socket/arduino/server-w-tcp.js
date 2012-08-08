@@ -9,10 +9,9 @@ var http = require('http')
   , io = require('socket.io')
   , sys = require(process.binding('natives').util ? 'util' : 'sys')
   , server;
-    
-
-tcpGuests = [];
-chatGuests = [];
+  
+var tcpGuests = [];
+var chatGuests = [];
 
 server = http.createServer(function(req, res){
   // your normal server code
@@ -46,6 +45,8 @@ send404 = function(res){
 
 server.listen(8090);
 
+
+
 // socket.io, I choose you
 // simplest chat application evar
 var io = io.listen(server)
@@ -53,7 +54,7 @@ var io = io.listen(server)
   
 io.on('connection', function(client){
   client.send({ buffer: buffer });
-  client.broadcast({ announcement: client.sessionId + ' connected' });
+  client.broadcast.send({ announcement: client.sessionId + ' connected' });
   
   chatGuests.push(client);
   
@@ -61,7 +62,7 @@ io.on('connection', function(client){
     var msg = { message: [client.sessionId, message] };
     buffer.push(msg);
     if (buffer.length > 15) buffer.shift();
-    client.broadcast(msg);
+    client.broadcast.send(msg);
     
     //send msg to tcp connections
     for (g in tcpGuests) {
@@ -70,14 +71,14 @@ io.on('connection', function(client){
   });
 
   client.on('disconnect', function(){
-    client.broadcast({ announcement: client.sessionId + ' disconnected' });
+    client.broadcast.send({ announcement: client.sessionId + ' disconnected' });
   });
 });
 
-
-//tcp socekt server
+//tcp socket server
 var tcpServer = net.createServer(function (socket) {
   console.log('tcp server running on port 1337');
+  console.log('web server running on http://localhost:8090');
 });
 
 tcpServer.on('connection',function(socket){
