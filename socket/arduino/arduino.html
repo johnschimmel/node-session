@@ -44,8 +44,7 @@
         return msg.replace(/</g, '&lt;').replace(/>/g, '&gt;');
       };
       
-      var socket = new io.Socket(null, {port: 8090, rememberTransport: false});
-      socket.connect();
+      var socket = new io.connect(null, { port: 8090, rememberTransport: false});
       socket.on('message', function(obj){
         if ('buffer' in obj){
           //ignore this
